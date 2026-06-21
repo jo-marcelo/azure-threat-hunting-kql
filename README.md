@@ -46,7 +46,7 @@ DeviceLogonEvents
 
 ### 3. Verification of Zero Initial Access
 To fully validate whether the perimeter held, two additional analytical pivots were executed:
-- `3-Cross-Reference Attacker IPs for Successful Auth.kql:` This query isolated the top threat actor IPs observed in step 2 and cross-referenced them against successful logons.
+- `3-Cross-Reference Attacker IPs for Successful Auth.kql:` This query isolated the top threat actor IPs observed in [step 2](https://github.com/jo-marcelo/azure-threat-hunting-kql#2-detecting-correlated-brute-force-successes) and cross-referenced them against successful logons.
 ```kql
 let ThreatActorIPs = dynamic([
     "120.49.65.104", "186.19.188.69", "148.72.152.145", "194.180.48.83", 
