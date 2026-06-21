@@ -66,11 +66,22 @@ DeviceLogonEvents
 - `4-Identify Correlation Between Failures and Successes.kql:` This query built a proactive inner join linking failed attempts and successful logons by `RemoteIP` and `DeviceName` to capture any stealthy or multi-stage brute-force successes. Result: 0 records returned.
 ```kql
 let VMName = "windows-target-";
-DeviceInfo 
-| where DeviceName startswith VMName
-| where IsInternetFacing == true
-| project Timestamp, DeviceName, PublicIP, OSPlatform, AdditionalFields
-| order by Timestamp desc
+let FailedLogons = DeviceLogonEvents
+    | where DeviceName startswith VMName  // <-- Filter early
+    | where LogonType has_any("Network", "Interactive", "RemoteInteractive", "Unlock")
+    | where ActionType == "LogonFailed"
+    | where isnotempty(RemoteIP)
+    | summarize FailedAttempts = count() by RemoteIP, DeviceName;
+let SuccessfulLogons = DeviceLogonEvents
+    | where DeviceName startswith VMName  // <-- Filter early here too
+    | where LogonType has_any("Network", "Interactive", "RemoteInteractive", "Unlock")
+    | where ActionType == "LogonSuccess"
+    | where isnotempty(RemoteIP)
+    | summarize SuccessfulLogons = count() by RemoteIP, DeviceName, AccountName;
+FailedLogons
+| join kind=inner SuccessfulLogons on RemoteIP, DeviceName
+| project RemoteIP, DeviceName, AccountName, FailedAttempts, SuccessfulLogons
+| order by FailedAttempts desc
 ```
 ---
 
