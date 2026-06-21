@@ -7,7 +7,7 @@
 
 ## 🗺️ Lab Architecture & Attack Lifecycle
 
-1. **Exposure:** A virtual machine (windows-target-) is misconfigured with an active public IP address.
+1. **Exposure:** A virtual machine (`windows-target-`) is misconfigured with an active public IP address.
 2. **Reconnaissance:** Automated internet bots scan the public space and locate the exposed asset.
 3. **Initial Access Attempt:** High-velocity brute-force authentication streams hit the endpoint from external IP addresses.
 4. **Compromise:** Brute-force tactics completely fail to secure a foothold due to robust password complexity or pre-existing credential hygiene, resulting in zero initial access.
@@ -18,7 +18,7 @@
 We utilized Advanced Hunting in Microsoft Defender for Endpoint to analyze the exposure and isolate malicious activity.
 
 ### 1. Identifying High-Volume Authentication Failures
-- 1-Confirm Internet-Facing Telemetry.kql This initial step, verifies the baseline vulnerability by querying for endpoints exposing an active internet footprint:
+- `1-Confirm Internet-Facing Telemetry.kql:` This initial step, verifies the baseline vulnerability by querying for endpoints exposing an active internet footprint:
 ```kql
 let VMName = "windows-target-";
 DeviceInfo 
@@ -30,7 +30,7 @@ DeviceInfo
 ---
 
 ### 2. Detecting Correlated Brute-Force Successes
-- **2-Isolate Top Failed Brute-Force Attempts.kql:** This query targets high-velocity authentication failures originating from external internet-facing bots:
+- `2-Isolate Top Failed Brute-Force Attempts.kql:` This query targets high-velocity authentication failures originating from external internet-facing bots:
 ```kql
 let VMName = "windows-target-";
 DeviceLogonEvents
@@ -46,7 +46,7 @@ DeviceLogonEvents
 
 ### 3. Verification of Zero Initial Access
 To fully validate whether the perimeter held, two additional analytical pivots were executed:
-- **3-Cross-Reference Attacker IPs for Successful Auth.kql:** This query isolated the top threat actor IPs observed in step 2 and cross-referenced them against successful logons. Result: 0 records returned.
+- `3-Cross-Reference Attacker IPs for Successful Auth.kql:` This query isolated the top threat actor IPs observed in step 2 and cross-referenced them against successful logons. Result: 0 records returned.
 ```kql
 let ThreatActorIPs = dynamic([
     "120.49.65.104", "186.19.188.69", "148.72.152.145", "194.180.48.83", 
@@ -63,7 +63,7 @@ DeviceLogonEvents
 | project Timestamp, DeviceName, AccountName, RemoteIP, LogonType, Protocol
 ```
 ---
-- **4-Identify Correlation Between Failures and Successes.kql:** This query built a proactive inner join linking failed attempts and successful logons by RemoteIP and DeviceName to capture any stealthy or multi-stage brute-force successes. Result: 0 records returned.
+- `4-Identify Correlation Between Failures and Successes.kql:` This query built a proactive inner join linking failed attempts and successful logons by `RemoteIP` and `DeviceName` to capture any stealthy or multi-stage brute-force successes. Result: 0 records returned.
 ```kql
 let VMName = "windows-target-";
 DeviceInfo 
@@ -84,4 +84,4 @@ To eliminate the attack surface and prevent future exposure risks, the following
 
 * **Network Security:** Bind administrative endpoints tightly; eliminate direct public IP exposures for infrastructure servers, enforcing Azure Bastion or Just-In-Time (JIT) VM access instead.
 * **Identity Security:** Formalize strict Account Lockout Policies to explicitly safeguard legacy or unconfigured assets from automated, sustained credential-stuffing campaigns.
-* **Credential Hygiene:** Construct continuous alerting rules around the DeviceInfo table tracking IsInternetFacing == true anomalies to catch rogue public exposures before automated threat actors can scan them.
+* **Credential Hygiene:** Construct continuous alerting rules around the `DeviceInfo` table tracking `IsInternetFacing == true` anomalies to catch rogue public exposures before automated threat actors can scan them.
