@@ -46,7 +46,7 @@ DeviceLogonEvents
 
 ### 3. Verification of Zero Initial Access
 To fully validate whether the perimeter held, two additional analytical pivots were executed:
-- `3-Cross-Reference Attacker IPs for Successful Auth.kql:` This query isolated the top threat actor IPs observed in step 2 and cross-referenced them against successful logons. Result: 0 records returned.
+- `3-Cross-Reference Attacker IPs for Successful Auth.kql:` This query isolated the top threat actor IPs observed in step 2 and cross-referenced them against successful logons.
 ```kql
 let ThreatActorIPs = dynamic([
     "120.49.65.104", "186.19.188.69", "148.72.152.145", "194.180.48.83", 
@@ -62,8 +62,9 @@ DeviceLogonEvents
 | where RemoteIP has_any(ThreatActorIPs)
 | project Timestamp, DeviceName, AccountName, RemoteIP, LogonType, Protocol
 ```
+Result: 0 records returned.
 ---
-- `4-Identify Correlation Between Failures and Successes.kql:` This query built a proactive inner join linking failed attempts and successful logons by `RemoteIP` and `DeviceName` to capture any stealthy or multi-stage brute-force successes. Result: 0 records returned.
+- `4-Identify Correlation Between Failures and Successes.kql:` This query built a proactive inner join linking failed attempts and successful logons by `RemoteIP` and `DeviceName` to capture any stealthy or multi-stage brute-force successes.
 ```kql
 let VMName = "windows-target-";
 let FailedLogons = DeviceLogonEvents
@@ -83,6 +84,7 @@ FailedLogons
 | project RemoteIP, DeviceName, AccountName, FailedAttempts, SuccessfulLogons
 | order by FailedAttempts desc
 ```
+Result: 0 records returned.
 ---
 
 ## 🛡️ MITRE ATT&CK Mapping & Findings
