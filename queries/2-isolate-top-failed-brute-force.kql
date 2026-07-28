@@ -1,1 +1,11 @@
-
+```kql
+let VMName = "windows-target-";
+DeviceLogonEvents
+| where DeviceName startswith VMName
+| where LogonType has_any("Network", "Interactive", "RemoteInteractive", "Unlock")
+| where ActionType == "LogonFailed"
+| where isnotempty(RemoteIP) and RemoteIP != "127.0.0.1"
+| summarize Attempts = count() by RemoteIP, DeviceName, LogonType
+| order by Attempts desc
+| take 20
+```
