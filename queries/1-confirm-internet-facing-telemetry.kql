@@ -1,0 +1,8 @@
+```kql
+let VMName = "windows-target-";
+DeviceInfo
+| where DeviceName startswith VMName
+| where IsInternetFacing == true
+| project Timestamp, DeviceName, PublicIP, OSPlatform, AdditionalFields
+| order by Timestamp desc
+```
