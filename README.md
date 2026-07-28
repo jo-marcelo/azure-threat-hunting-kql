@@ -1,9 +1,5 @@
 # Azure Threat Hunt — Internet-Facing Brute Force
 
-**Suggested repo description:** `Threat hunt against a publicly exposed Azure VM using MDE and KQL — detecting brute-force campaigns and proving zero compromise through correlation analysis.`
-
-**Suggested topics:** `threat-hunting` `kql` `microsoft-defender-for-endpoint` `azure` `blue-team` `soc` `mitre-attack` `brute-force`
-
 ---
 
 ## Summary
