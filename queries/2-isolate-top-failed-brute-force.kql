@@ -11,3 +11,8 @@ let FailedExternal =
 // Scale of the campaign
 FailedExternal
 | summarize TotalAttempts = count(), DistinctSources = dcount(RemoteIP)
+
+// Ranked sources — feeds the IP list used in step 3
+FailedExternal
+| summarize Attempts = count() by RemoteIP, DeviceName, LogonType
+| top 20 by Attempts
