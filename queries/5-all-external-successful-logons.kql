@@ -1,0 +1,10 @@
+let VMName = "windows-target-";
+let ExposureStart = datetime(YYYY-MM-DD HH:MM:SS);  // from query 1
+let ExposureEnd   = datetime(YYYY-MM-DD HH:MM:SS);  // from query 1
+DeviceLogonEvents
+| where Timestamp between (ExposureStart .. ExposureEnd)
+| where DeviceName startswith VMName
+| where ActionType == "LogonSuccess"
+| where isnotempty(RemoteIP) and not(ipv4_is_private(RemoteIP))
+| project Timestamp, DeviceName, AccountName, RemoteIP, LogonType, Protocol
+| order by Timestamp asc
