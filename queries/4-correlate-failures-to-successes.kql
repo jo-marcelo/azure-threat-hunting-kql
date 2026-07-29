@@ -1,14 +1,19 @@
-```kql
 let VMName = "windows-target-";
-let FailedLogons = DeviceLogonEvents
+let ExposureStart = datetime(YYYY-MM-DD HH:MM:SS);  // from query 1
+let ExposureEnd   = datetime(YYYY-MM-DD HH:MM:SS);  // from query 1
+let FailedLogons =
+    DeviceLogonEvents
+    | where Timestamp between (ExposureStart .. ExposureEnd)
     | where DeviceName startswith VMName
-    | where LogonType has_any("Network", "Interactive", "RemoteInteractive", "Unlock")
+    | where LogonType in~ ("Network", "Interactive", "RemoteInteractive", "Unlock")
     | where ActionType == "LogonFailed"
     | where isnotempty(RemoteIP)
     | summarize FailedAttempts = count() by RemoteIP, DeviceName;
-let SuccessfulLogons = DeviceLogonEvents
+let SuccessfulLogons =
+    DeviceLogonEvents
+    | where Timestamp between (ExposureStart .. ExposureEnd)
     | where DeviceName startswith VMName
-    | where LogonType has_any("Network", "Interactive", "RemoteInteractive", "Unlock")
+    | where LogonType in~ ("Network", "Interactive", "RemoteInteractive", "Unlock")
     | where ActionType == "LogonSuccess"
     | where isnotempty(RemoteIP)
     | summarize SuccessfulLogons = count() by RemoteIP, DeviceName, AccountName;
@@ -16,4 +21,3 @@ FailedLogons
 | join kind=inner SuccessfulLogons on RemoteIP, DeviceName
 | project RemoteIP, DeviceName, AccountName, FailedAttempts, SuccessfulLogons
 | order by FailedAttempts desc
-```
