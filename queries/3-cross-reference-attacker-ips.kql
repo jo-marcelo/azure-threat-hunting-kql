@@ -1,5 +1,5 @@
-```kql
-// Source IPs redacted. Populate from the output of query 2 in your own tenant.
+// Source IPs redacted using RFC 5737 documentation ranges.
+// Populate from the output of query 2 in your own tenant.
 let ThreatActorIPs = dynamic([
     "203.0.113.10", "198.51.100.42", "192.0.2.77"
     // ... remaining observed sources
@@ -8,6 +8,5 @@ let VMName = "windows-target-";
 DeviceLogonEvents
 | where DeviceName startswith VMName
 | where ActionType == "LogonSuccess"
-| where RemoteIP has_any(ThreatActorIPs)
+| where RemoteIP in~ (ThreatActorIPs)
 | project Timestamp, DeviceName, AccountName, RemoteIP, LogonType, Protocol
-```
